@@ -10,12 +10,15 @@ void insertion_sort(int a[], int size);
 void mergesort_serial(int a[], int size, int temp[]);
 void mergesort_parallel_omp(int a[], int size, int temp[], int threadCount);
 void run_omp(int a[], int size, int temp[], int threadCount);
+
+void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int p3);
+void pMergeSort(int A[], int left, int right, int B[], int s);
 int main(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
 
-    int size = 100;
+    int size = 1000;
     //change later
     int threadCount = 2;
 
@@ -43,44 +46,54 @@ int main(int argc, char *argv[])
     }
 
     // Array allocation
-    int *a = malloc(sizeof(int) * size);
-    int *temp = malloc(sizeof(int) * size);
+    // int *A = malloc(sizeof(int) * size);
+    // int *B = malloc(sizeof(int) * size);
+    int A[size];
+    int B[size];
 
-    if (a == NULL || temp == NULL)
+    if (A == NULL || B == NULL)
     {
         printf("Error with memory allocation %d\n", size);
         return 1;
     }
 
     // Random array initialization
-    srand(1000);
+    srand(100);
     for (int i = 0; i < size; i++)
     {
-        a[i] = rand() % size;
+        A[i] = rand() % size;
     }
 
-    // Sort
-    double start = get_time();
-    run_omp(a, size, temp, threadCount);
-    double end = get_time();
+    int right = (int)sizeof(A) / (int)sizeof(A[0]);
+    int left = 0;
+    int s = 0;
 
-    printf("Start = %.2f\n", start);
+    pMergeSort(A, left, right, B, s);
 
-    printf("End = %.2f\n", end);
+    //pmerge(a, 0)
 
-    printf("Elapsed = %.2f\n", end - start);
+    // // Sort
+    // double start = get_time();
+    // run_omp(a, size, temp, threadCount);
+    // double end = get_time();
 
-    // Result check
-    for (int i = 1; i < size; i++)
-    {
-        if (!(a[i - 1] <= a[i]))
-        {
-            printf("Implementation error: a[%d]=%d > a[%d]=%d\n", i - 1,
-                   a[i - 1], i, a[i]);
-            return 1;
-        }
-    }
-    puts("-Success-");
+    // printf("Start = %.2f\n", start);
+
+    // printf("End = %.2f\n", end);
+
+    // printf("Elapsed = %.2f\n", end - start);
+
+    // // Result check
+    // for (int i = 1; i < size; i++)
+    // {
+    //     if (!(a[i - 1] <= a[i]))
+    //     {
+    //         printf("Implementation error: a[%d]=%d > a[%d]=%d\n", i - 1,
+    //                a[i - 1], i, a[i]);
+    //         return 1;
+    //     }
+    // }
+    // puts("-Success-");
     return 0;
 }
 
@@ -121,7 +134,7 @@ void mergesort_parallel_omp(int a[], int size, int temp[], int threadCount)
     }
     else
     {
-        printf("Error: %d threadCount\n", threadCount);
+        printf("Error: %d threads\n", threadCount);
         return;
     }
 }
@@ -138,6 +151,87 @@ void mergesort_serial(int a[], int size, int temp[])
     mergesort_serial(a + size / 2, size - size / 2, temp);
     // Merge the two sorted subarrays into a temp array
     merge(a, size, temp);
+}
+
+// A is our actual array and B is our final destination for sorting
+void pMergeSort(int A[], int left, int right, int B[], int s)
+{
+    printf("Left: %d\n", left);
+    printf("Right %d\n", right);
+
+    int sizeOfPartition = right - left;
+    printf("%d\n", sizeOfPartition);
+
+    if (sizeOfPartition == 1)
+    {
+        B[s] = A[left];
+    }
+    else
+    {
+        int T[sizeOfPartition];
+        int q = floor((left + right) / 2);
+        int qPrime = q - left + 1;
+        printf("q: %d\n", q);
+        printf("qPrime: %d\n", qPrime);
+
+        // spawn
+        // pMergeSort(A, left, q, T, 1);
+        // pMergeSort(A, q + 1, right, T, qPrime + 1);
+        // //sync
+        // pmerge(T, 1, qPrime, qPrime + 1, sizeOfPartition, B, s);
+    }
+}
+
+//pmerge (T, p1, r1, p2, r2, A, p3)
+void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int p3)
+{
+    //size of each partition1
+    int n1 = right1 - left1 + 1;
+    //size of partition2
+    int n2 = right2 - left2 + 1;
+
+    if (n1 < n2)
+    {
+        //exchange left1 and left2
+        int temp;
+        temp = left1;
+        left1 = left2;
+        left2 = temp;
+
+        //exchange right1 and right2
+        temp = right1;
+        right1 = right2;
+        right2 = temp;
+
+        //exchange n1 and n2
+        temp = n1;
+        n1 = n2;
+        n2 = temp;
+    }
+
+    //n1 empty, sorting algo exits
+    if (n1 == 0)
+    {
+        return;
+    }
+    else
+    {
+        /*Letting x = T[q1] be the median of 
+        T[p1...r1] and q2 be the place in T[p2...r2] 
+        such that x would fall between T Œq2 􏰀 1 and T Œq2,
+        */
+        int q1 = floor((left1 + right1) / 2);
+
+        int q2 = binarySearch(t[q1], t, left2, right2);
+        printf("Median of 1st partition: %d\n", q1);
+        printf("Median of 2nd partition: %d\n", q2);
+
+        // int q3 = p3 + (q1 - left1) + (q2 - left2);
+        // a[q3] = t[q1];
+
+        // pmerge(t, left1, q1 - 1, left2, q2 - 1, a, p3);
+        // pmerge(t, q1 + 1, right1, q2, right2, a, q3 + 1);
+    }
 }
 
 // needed for p merge
