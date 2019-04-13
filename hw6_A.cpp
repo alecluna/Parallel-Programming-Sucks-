@@ -6,7 +6,11 @@
 #include "get_time.c"
 
 #define SMALL 32
-#define SIZE 10
+#define SIZE 100
+#define max(a, b) \
+    ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
 
 extern double get_time(void);
 void merge(int a[], int size, int temp[]);
@@ -185,58 +189,76 @@ void pMergeSort(int A[], int p, int r, int B[], int s)
 
         // q is right of this partition
         pMergeSort(A, p, q, T, 1);
-        pMergeSort(A, q + 1, r, T, qPrime + 1);
+        pMergeSort(A, q + 1, r, T, qPrime);
         // //sync
-        // pmerge(T, 1, qPrime, qPrime + 1, sizeOfPartition, B, s);
+        printf("\n");
+
+        pmerge(T, 0, qPrime, qPrime + 1, sizeOfPartition, B, s);
     }
 }
 
 //pmerge (T, p1, r1, p2, r2, A, p3)
 void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int p3)
 {
-    //size of each partition1
-    int n1 = right1 - left1 + 1;
-    //size of partition2
-    int n2 = right2 - left2 + 1;
+    int n1 = right1 - left1;
+    int n2 = right2 - left2;
 
     if (n1 < n2)
     {
+        printf("n1 is < n2 .... entering if block\n");
+
         //exchange left1 and left2
         int temp;
         temp = left1;
         left1 = left2;
         left2 = temp;
+        printf("\n");
+        printf("newly swapped left1: %d\n", left1);
+        printf("newly swapped left2: %d\n", left2);
+        printf("\n");
 
         //exchange right1 and right2
         temp = right1;
         right1 = right2;
         right2 = temp;
 
+        printf("\n");
+        printf("newly swapped right1: %d\n", right1);
+        printf("newly swapped right2: %d\n", right2);
+        printf("\n");
+
         //exchange n1 and n2
         temp = n1;
         n1 = n2;
         n2 = temp;
+
+        printf("\n");
+        printf("newly swapped n1: %d\n", n1);
+        printf("newly swapped n2: %d\n", n2);
+        printf("\n");
     }
 
-    //n1 empty, sorting algo exits
+    //     //n1 empty, sorting algo exits
     if (n1 == 0)
     {
         return;
     }
     else
     {
-        /*Letting x = T[q1] be the median of 
-        T[p1...r1] and q2 be the place in T[p2...r2] 
-        such that x would fall between T Œq2 􏰀 1 and T Œq2,
-        */
-        int q1 = floor((left1 + right1) / 2);
+        /*Letting x = T[q1] be the median of
+    T[p1...r1] and q2 be the place in T[p2...r2]
+    such that x would fall between T Œq2 􏰀 1 and T Œq2,
+    //*/
+        printf("left1: %d + right1: %d\n", left1, right1);
+        int q1 = (left1 + right1) / 2;
+        printf("q1: %d\n", q1);
 
         int q2 = binarySearch(t[q1], t, left2, right2);
-        printf("Median of 1st partition: %d\n", q1);
-        printf("Median of 2nd partition: %d\n", q2);
+        printf("q2: %d\n", q2);
 
-        // int q3 = p3 + (q1 - left1) + (q2 - left2);
-        // a[q3] = t[q1];
+        int q3 = p3 + (q1 - left1) + (q2 - left2);
+        printf("q3: %d", q3);
+        a[q3] = t[q1];
 
         // pmerge(t, left1, q1 - 1, left2, q2 - 1, a, p3);
         // pmerge(t, q1 + 1, right1, q2, right2, a, q3 + 1);
@@ -244,28 +266,32 @@ void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int 
 }
 
 // needed for p merge
-int binarySearch(int x, int arr[], int p, int end)
+int binarySearch(int x, int arr[], int p, int r)
 {
     int low = p;
-    int high = end;
+    int high;
+    if (p > r + 1)
+    {
+        high = p;
+    }
+    else
+    {
+        high = r + 1;
+    }
 
-    while (low < high + 1)
+    while (low < high)
     {
         int mid = (high + low) / 2;
-
-        if (arr[mid] == x)
-            return mid;
-
-        if (arr[mid] > x)
+        if (x <= arr[mid])
         {
-            return binarySearch(x, arr, low, mid - 1);
+            high = mid;
         }
         else
         {
-            return binarySearch(x, arr, mid + 1, high);
+            low = mid + 1;
         }
     }
-    return -1;
+    return high;
 }
 
 // void merge(int a[], int size, int temp[])
