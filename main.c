@@ -3,15 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <omp.h>
-#include "get_time.c"
-#include "hw6_A.c"
-#include "hw6_B.c"
-#include "hw6_C.c"
+#include "hw6_A.h"
 
 #define SMALL 32
 #define SIZE 10
-
-extern double get_time(void);
 
 int main(int argc, char *argv[])
 {
@@ -39,7 +34,6 @@ int main(int argc, char *argv[])
         printf("Error: Cannot use %d threads, only %d threads available\n", threadCount, maxThreads);
         return 1;
     }
-
     int A[SIZE];
     int B[SIZE];
 
@@ -50,35 +44,27 @@ int main(int argc, char *argv[])
     }
 
     // Random array initialization
-    srand(100);
-    for (int i = 0; i < SIZE; i++)
+    srand(20);
+    for (int i = SIZE - 1; i >= 0; i--)
     {
-        A[i] = rand() % SIZE;
+        A[i] = i;
+        printf("A[%d] = %d\n", i, A[i]);
     }
+    printf("\n");
 
-    int aSize = (int)sizeof(A) / (int)sizeof(A[0]);
-    int bSize = (int)sizeof(B) / (int)sizeof(B[0]);
-
-    printf("A[]: %d\n B[]: %d\n", aSize, bSize);
-
-    int right = aSize;
+    int right = SIZE;
     int left = 0;
     int s = 0;
+    pMergeSort(A, left, right, B, s);
 
-    for (int i = 0; i <= SIZE; i++)
-    {
-        printf("%d,", B[i]);
-    }
     // Sort
-    double start = get_time();
-    //run_omp(a, size, temp, threadCount);
-    double end = get_time();
+    //double start = get_time();
 
-    printf("Start = %.2f\n", start);
+    // printf("Start = %.2f\n", start);
 
-    printf("End = %.2f\n", end);
+    // printf("End = %.2f\n", end);
 
-    printf("Elapsed = %.2f\n", end - start);
+    // printf("Elapsed = %.2f\n", end - start);
 
     // Result check
     // for (int i = 1; i < SIZE; i++)
