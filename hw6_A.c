@@ -6,7 +6,7 @@
 #include "get_time.c"
 
 #define SMALL 32
-#define SIZE 10
+#define SIZE 20
 
 extern double get_time(void);
 void merge(int a[], int size, int temp[]);
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     }
 
     // Random array initialization
-    srand(100);
+    srand(1000);
     for (int i = 0; i < SIZE; i++)
     {
         A[i] = rand() % SIZE;
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
     // Sort
     // double start = get_time();
-    // run_omp(a, size, temp, threadCount);
+    // run_omp(A, SIZE, B, threadCount);
     // double end = get_time();
 
     // printf("Start = %.2f\n", start);
@@ -153,7 +153,7 @@ void mergesort_serial(int a[], int size, int temp[])
     mergesort_serial(a, size / 2, temp);
     mergesort_serial(a + size / 2, size - size / 2, temp);
     // Merge the two sorted subarrays into a temp array
-    //merge(a, size, temp);
+    // merge(a, size, temp);
 }
 
 // A is our actual array and B is our final destination for sorting
@@ -162,16 +162,16 @@ void pMergeSort(int A[], int p, int r, int B[], int s)
     printf("Left: %d\n", p);
     printf("Right %d\n", r);
 
-    int sizeOfPartition = r - p;
+    int sizeOfPartition = r - p + 1;
     printf("Size of partition: %d\n", sizeOfPartition);
 
-    if (sizeOfPartition == 0)
+    if (sizeOfPartition == 1)
     {
         B[s] = A[p];
+        printf("\nB[s]:  %d\n", B[s]);
     }
     else
     {
-
         int T[sizeOfPartition];
 
         int sizeOfT = (int)sizeof(T) / (int)sizeof(T[0]);
@@ -185,18 +185,18 @@ void pMergeSort(int A[], int p, int r, int B[], int s)
 
         // q is right of this partition
         pMergeSort(A, p, q, T, 1);
-        pMergeSort(A, q + 1, r, T, qPrime + 1);
-        // //sync
-        // pmerge(T, 1, qPrime, qPrime + 1, sizeOfPartition, B, s);
+        pMergeSort(A, q + 1, r, T, qPrime);
+        //sync
+        printf("\n");
+
+        pmerge(T, 0, qPrime, qPrime + 1, sizeOfPartition, B, s);
     }
 }
 
 //pmerge (T, p1, r1, p2, r2, A, p3)
 void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int p3)
 {
-    //size of each partition1
     int n1 = right1 - left1 + 1;
-    //size of partition2
     int n2 = right2 - left2 + 1;
 
     if (n1 < n2)
@@ -218,103 +218,49 @@ void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int 
         n2 = temp;
     }
 
-    //n1 empty, sorting algo exits
+    //     //n1 empty, sorting algo exits
     if (n1 == 0)
     {
         return;
     }
     else
     {
-        /*Letting x = T[q1] be the median of 
-        T[p1...r1] and q2 be the place in T[p2...r2] 
-        such that x would fall between T Œq2 􏰀 1 and T Œq2,
-        */
-        int q1 = floor((left1 + right1) / 2);
-
+        int q1 = (left1 + right1) / 2;
         int q2 = binarySearch(t[q1], t, left2, right2);
-        printf("Median of 1st partition: %d\n", q1);
-        printf("Median of 2nd partition: %d\n", q2);
+        int q3 = p3 + (q1 - left1) + (q2 - left2);
 
-        // int q3 = p3 + (q1 - left1) + (q2 - left2);
-        // a[q3] = t[q1];
+        a[q3] = t[q1];
 
-        // pmerge(t, left1, q1 - 1, left2, q2 - 1, a, p3);
-        // pmerge(t, q1 + 1, right1, q2, right2, a, q3 + 1);
+        //TODO: fix this seg fault
+        pmerge(t, left1, q1 - 1, left2, q2 - 1, a, p3);
+        pmerge(t, q1 + 1, right1, q2, right2, a, q3 + 1);
     }
 }
 
-// needed for p merge
-int binarySearch(int x, int arr[], int p, int end)
+int binarySearch(int x, int arr[], int p, int r)
 {
     int low = p;
-    int high = end;
+    int high;
+    if (p > r + 1)
+    {
+        high = p;
+    }
+    else
+    {
+        high = r + 1;
+    }
 
-    while (low < high + 1)
+    while (low < high)
     {
         int mid = (high + low) / 2;
-
-        if (arr[mid] == x)
-            return mid;
-
-        if (arr[mid] > x)
+        if (x <= arr[mid])
         {
-            return binarySearch(x, arr, low, mid - 1);
+            high = mid;
         }
         else
         {
-            return binarySearch(x, arr, mid + 1, high);
+            low = mid + 1;
         }
     }
-    return -1;
+    return high;
 }
-
-// void merge(int a[], int size, int temp[])
-// {
-//     int i1 = 0;
-//     int i2 = size / 2;
-//     int tempIndex = 0;
-//     while (i1 < size / 2 && i2 < size)
-//     {
-//         if (a[i1] < a[i2])
-//         {
-//             temp[tempIndex] = a[i1];
-//             i1++;
-//         }
-//         else
-//         {
-//             temp[tempIndex] = a[i2];
-//             i2++;
-//         }
-//         tempIndex++;
-//     }
-//     while (i1 < size / 2)
-//     {
-//         temp[tempIndex] = a[i1];
-//         i1++;
-//         tempIndex++;
-//     }
-//     while (i2 < size)
-//     {
-//         temp[tempIndex] = a[i2];
-//         i2++;
-//         tempIndex++;
-//     }
-//     // Copy sorted temp array into main array, a
-//     memcpy(a, temp, size * sizeof(int));
-// }
-
-// void insertion_sort(int a[], int size)
-// {
-//     int i;
-//     for (i = 0; i < size; i++)
-//     {
-//         int j, v = a[i];
-//         for (j = i - 1; j >= 0; j--)
-//         {
-//             if (a[j] <= v)
-//                 break;
-//             a[j + 1] = a[j];
-//         }
-//         a[j + 1] = v;
-//     }
-// }
