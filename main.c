@@ -4,6 +4,9 @@
 #include <string.h>
 #include <omp.h>
 #include "hw6_A.h"
+#include "hw6_B.h"
+#include "hw6_C.h"
+#include "get_time.c"
 
 #define SMALL 32
 #define SIZE 10
@@ -50,12 +53,37 @@ int main(int argc, char *argv[])
         A[i] = i;
         printf("A[%d] = %d\n", i, A[i]);
     }
-    printf("\n");
 
     int right = SIZE;
     int left = 0;
     int s = 0;
+
+    pMergeSortSerial(A, left, right, B, s);
+
+    printf("\n Serial pmerge algorithm: \n");
+
+    for (int i = 0; i < SIZE; i++)
+    {
+        printf("\n B[%d] = %d", i, B[i]);
+    }
+
+    ////////////////////////////////////////////////////
+
+    printf("\n//////////////////////////////////////\n");
+
+    for (int i = SIZE - 1; i >= 0; i--)
+    {
+        A[i] = i;
+        printf("A[%d] = %d\n", i, A[i]);
+    }
+
+    printf("\n pmerge algorithm: \n");
     pMergeSort(A, left, right, B, s);
+
+    for (int i = 0; i < SIZE; i++)
+    {
+        printf("\n B[%d] = %d", i, B[i]);
+    }
 
     // Sort
     //double start = get_time();
