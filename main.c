@@ -7,9 +7,22 @@
 #include "hw6_B.h"
 #include "hw6_C.h"
 #include "get_time.c"
+#include <stdint.h>
+
+#ifdef _MSC_VER
+#include <intrin.h>
+#else
+#include <x86intrin.h>
+#endif
+
+uint64_t readTSCp()
+{
+    unsigned dummy;
+    return __rdtscp(&dummy);
+}
 
 #define SMALL 32
-#define SIZE 10
+#define SIZE 1000
 
 int main(int argc, char *argv[])
 {
@@ -39,6 +52,10 @@ int main(int argc, char *argv[])
     }
     int A[SIZE];
     int B[SIZE];
+    int right = SIZE;
+    int left = 0;
+    int s = 0;
+    uint64_t start, end;
 
     if (SIZE < 0)
     {
@@ -54,64 +71,48 @@ int main(int argc, char *argv[])
         printf("A[%d] = %d\n", i, A[i]);
     }
 
-    int right = SIZE;
-    int left = 0;
-    int s = 0;
-
-    pMergeSortSerial(A, left, right, B, s);
-
     printf("\n Serial pmerge algorithm: \n");
 
-    for (int i = 0; i < SIZE; i++)
-    {
-        printf("\n B[%d] = %d", i, B[i]);
-    }
+    start = readTSCp();
+    printf("Start = %llu\n", start);
+    pMergeSortSerial(A, left, right, B, s);
+    end = readTSCp();
+    printf("End = %llu\n", end);
+    printf("Elapsed = %llu\n", readTSCp() - start);
 
-    ////////////////////////////////////////////////////
+    // for (int i = 0; i < SIZE; i++)
+    // {
+    //     printf("\n B[%d] = %d", i, B[i]);
+    // }
 
-    printf("\n//////////////////////////////////////\n");
-
-    for (int i = SIZE - 1; i >= 0; i--)
-    {
-        A[i] = i;
-        printf("A[%d] = %d\n", i, A[i]);
-    }
+    // for (int i = SIZE - 1; i >= 0; i--)
+    // {
+    //     A[i] = i;
+    //     printf("A[%d] = %d\n", i, A[i]);
+    // }
 
     printf("\n pmerge algorithm: \n");
-    pMergeSort(A, left, right, B, s);
 
-    for (int i = 0; i < SIZE; i++)
-    {
-        printf("\n B[%d] = %d", i, B[i]);
-    }
+    start = readTSCp();
+    printf("Start = %llu\n", start);
+    pMergeSort(A, left, right, B, s);
+    end = readTSCp();
+    printf("End = %llu\n", end);
+    printf("Elapsed = %llu\n", readTSCp() - start);
+
+    // for (int i = 0; i < SIZE; i++)
+    // {
+    //     printf("\n B[%d] = %d", i, B[i]);
+    // }
 
     printf("\n Merge Sort Algorithm: \n");
+
+    start = readTSCp();
+    printf("Start = %llu\n", start);
     mergesort140(A, B, SIZE);
+    end = readTSCp();
+    printf("End = %llu\n", end);
+    printf("Elapsed = %llu\n", readTSCp() - start);
 
-    for (int i = 0; i < SIZE; i++)
-    {
-        printf("\n B[%d] = %d", i, B[i]);
-    }
-
-    // Sort
-    //double start = get_time();
-
-    // printf("Start = %.2f\n", start);
-
-    // printf("End = %.2f\n", end);
-
-    // printf("Elapsed = %.2f\n", end - start);
-
-    // Result check
-    // for (int i = 1; i < SIZE; i++)
-    // {
-    //     if (!(a[i - 1] <= a[i]))
-    //     {
-    //         printf("Implementation error: a[%d]=%d > a[%d]=%d\n", i - 1,
-    //                a[i - 1], i, a[i]);
-    //         return 1;
-    //     }
-    // }
-    // puts("-Success-");
     return 0;
 }
