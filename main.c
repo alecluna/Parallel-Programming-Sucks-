@@ -85,6 +85,14 @@ int main(int argc, char *argv[])
         printf("\n B[%d] = %d", i, B[i]);
     }
 
+    printf("\n Merge Sort Algorithm: \n");
+    mergesort140(A, B, SIZE);
+
+    for (int i = 0; i < SIZE; i++)
+    {
+        printf("\n B[%d] = %d", i, B[i]);
+    }
+
     // Sort
     //double start = get_time();
 

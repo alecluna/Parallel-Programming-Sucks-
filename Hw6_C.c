@@ -10,8 +10,8 @@
 
 // A is our actual array and B is our final destination for sorting
 
-//pmerge (T, p1, r1, p2, r2, A, p3)
-void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int p3)
+//pmergeMS (T, p1, r1, p2, r2, A, p3)
+void pmergeMS(int t[], int left1, int right1, int left2, int right2, int a[], int p3)
 {
     int n1 = right1 - left1 + 1;
     int n2 = right2 - left2 + 1;
@@ -48,7 +48,7 @@ void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int 
     //*/
         int q1 = (left1 + right1) / 2;
 
-        int q2 = binarySearch(t[q1], t, left2, right2);
+        int q2 = binarySearchMS(t[q1], t, left2, right2);
 
         int q3 = p3 + (q1 - left1) + (q2 - left2);
         a[q3] = t[q1];
@@ -60,18 +60,18 @@ void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int 
 
 #pragma omp single
             {
-                pmerge(t, left1, q1 - 1, left2, q2 - 1, a, p3);
+                pmergeMS(t, left1, q1 - 1, left2, q2 - 1, a, p3);
             }
 #pragma omp single
             {
-                pmerge(t, q1 + 1, right1, q2, right2, a, q3 + 1);
+                pmergeMS(t, q1 + 1, right1, q2, right2, a, q3 + 1);
             }
         }
     }
 }
 
 // needed for p merge
-int binarySearch(int x, int arr[], int p, int r)
+int binarySearchMS(int x, int arr[], int p, int r)
 {
     int low = p;
     int high;
@@ -107,9 +107,9 @@ void ms(int a[], int b[], int p, int r, int a_to_b)
         ms(a, b, p, q, !a_to_b);
         ms(a, b, q + 1, r, !a_to_b);
         if (a_to_b)
-            pmerge(a, p, q, q + 1, r, b, p);
+            pmergeMS(a, p, q, q + 1, r, b, p);
         else
-            pmerge(b, p, q, q + 1, r, a, p);
+            pmergeMS(b, p, q, q + 1, r, a, p);
     }
 }
 void mergesort140(int src[], int dst[], int n)
