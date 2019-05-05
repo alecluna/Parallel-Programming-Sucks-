@@ -42,10 +42,7 @@ void pmergeMS(int t[], int left1, int right1, int left2, int right2, int a[], in
     }
     else
     {
-        /*Letting x = T[q1] be the median of
-    T[p1...r1] and q2 be the place in T[p2...r2]
-    such that x would fall between T Œq2 􏰀 1 and T Œq2,
-    //*/
+
         int q1 = (left1 + right1) / 2;
 
         int q2 = binarySearchMS(t[q1], t, left2, right2);

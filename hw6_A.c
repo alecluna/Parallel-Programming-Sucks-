@@ -26,12 +26,12 @@ void pMergeSortSerial(int A[], int p, int r, int B[], int s)
 
         pMergeSortSerial(A, p, q, T, 0);
         pMergeSortSerial(A, q + 1, r, T, qPrime + 1);
-        pmergeSerial(T, 0, qPrime, qPrime + 1, sizeOfPartition, B, s);
+        pmerge(T, 0, qPrime, qPrime + 1, sizeOfPartition, B, s);
     }
 }
 
-//pmergeSerial (T, p1, r1, p2, r2, A, p3)
-void pmergeSerial(int t[], int left1, int right1, int left2, int right2, int a[], int p3)
+//pmerge (T, p1, r1, p2, r2, A, p3)
+void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int p3)
 {
     int n1 = right1 - left1 + 1;
     int n2 = right2 - left2 + 1;
@@ -70,8 +70,8 @@ void pmergeSerial(int t[], int left1, int right1, int left2, int right2, int a[]
         a[q3] = t[q1];
 
         //TODO: fix this seg fault
-        pmergeSerial(t, left1, q1 - 1, left2, q2 - 1, a, p3);
-        pmergeSerial(t, q1 + 1, right1, q2, right2, a, q3 + 1);
+        pmerge(t, left1, q1 - 1, left2, q2 - 1, a, p3);
+        pmerge(t, q1 + 1, right1, q2, right2, a, q3 + 1);
     }
 }
 
