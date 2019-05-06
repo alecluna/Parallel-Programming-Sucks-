@@ -24,6 +24,7 @@ int main()
 {
     int *src = malloc(SZ * sizeof(int));
     int *dst = malloc(SZ * sizeof(int));
+
     clock_t min = 0x7fffffff;
     int good = 0;
     for (int i = 0; i < 3; i++)

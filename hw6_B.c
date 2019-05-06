@@ -30,15 +30,10 @@ void pMergeSort(int A[], int p, int r, int B[], int s)
 
 #pragma omp parallel
         {
+            pMergeSort(A, p, q, T, 0);
 
-#pragma omp single
-            {
-                pMergeSort(A, p, q, T, 0);
-            }
-#pragma omp single
-            {
-                pMergeSort(A, q + 1, r, T, qPrime + 1);
-            }
+            pMergeSort(A, q + 1, r, T, qPrime + 1);
+
             // //sync
         }
         pmerge(T, 0, qPrime, qPrime + 1, sizeOfPartition, B, s);
@@ -93,14 +88,9 @@ void pmerge(int t[], int left1, int right1, int left2, int right2, int a[], int 
 #pragma omp parallel
         {
 
-#pragma omp single
-            {
-                pmerge(t, left1, q1 - 1, left2, q2 - 1, a, p3);
-            }
-#pragma omp single
-            {
-                pmerge(t, q1 + 1, right1, q2, right2, a, q3 + 1);
-            }
+            pmerge(t, left1, q1 - 1, left2, q2 - 1, a, p3);
+
+            pmerge(t, q1 + 1, right1, q2, right2, a, q3 + 1);
         }
     }
 }
